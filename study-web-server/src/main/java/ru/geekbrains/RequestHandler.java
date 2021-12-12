@@ -1,6 +1,8 @@
 package ru.geekbrains;
 
 import ru.geekbrains.domain.HttpRequest;
+import ru.geekbrains.domain.HttpResponse;
+import ru.geekbrains.domain.ResponseType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,36 +26,25 @@ public class RequestHandler implements Runnable {
     public void run() {
         Deque<String> rawRequest = socketService.readRequest();
         HttpRequest httpRequest = requestParser.parseRequest(rawRequest);
-
-        StringBuilder response = new StringBuilder();
         if (httpRequest.getMethod().equals("GET")) {
             Path path = Paths.get(WWW, httpRequest.getUrl());
 
             if (!Files.exists(path)) {
-                response.append("HTTP/1.1 404 NOT_FOUND\n");
-                response.append("Content-Type: text/html; charset=utf-8\n");
-                response.append("\n");
-                response.append("<h1>Файл не найден!</h1>");
-                socketService.writeResponse(response.toString());
+                HttpResponse resp = new HttpResponse(ResponseType.NOT_FOUND);
+                socketService.writeResponse(resp.getResponse("<h1>Файл не найден!</h1>"));
                 return;
             }
-
-            response.append("HTTP/1.1 200 OK\n");
-            response.append("Content-Type: text/html; charset=utf-8\n");
-            response.append("\n");
-
+            HttpResponse resp = new HttpResponse(ResponseType.OK);
+            StringBuilder content = new StringBuilder();
             try {
-                Files.readAllLines(path).forEach(response::append);
+                Files.readAllLines(path).forEach(content::append);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-            socketService.writeResponse(response.toString());
+            socketService.writeResponse(resp.getResponse(content.toString()));
         } else {
-            response.append("HTTP/1.1 405 METHOD_NOT_ALLOWED\n");
-            response.append("Content-Type: text/html; charset=utf-8\n");
-            response.append("\n");
-            response.append("<h1>Метод не поддерживается!</h1>");
-            socketService.writeResponse(response.toString());
+            HttpResponse resp = new HttpResponse(ResponseType.METHOD_NOT_ALLOWED);
+            socketService.writeResponse(resp.getResponse("<h1>Метод не поддерживается!</h1>"));
             return;
         }
         try {
