@@ -30,11 +30,11 @@ public class RequestHandler implements Runnable {
             Path path = Paths.get(WWW, httpRequest.getUrl());
 
             if (!Files.exists(path)) {
-                HttpResponse resp = new HttpResponse(ResponseType.NOT_FOUND);
+                ResponseService resp = new ResponseService(ResponseType.NOT_FOUND);
                 socketService.writeResponse(resp.getResponse("<h1>Файл не найден!</h1>"));
                 return;
             }
-            HttpResponse resp = new HttpResponse(ResponseType.OK);
+            ResponseService resp = new ResponseService(ResponseType.OK);
             StringBuilder content = new StringBuilder();
             try {
                 Files.readAllLines(path).forEach(content::append);
@@ -43,7 +43,7 @@ public class RequestHandler implements Runnable {
             }
             socketService.writeResponse(resp.getResponse(content.toString()));
         } else {
-            HttpResponse resp = new HttpResponse(ResponseType.METHOD_NOT_ALLOWED);
+            ResponseService resp = new ResponseService(ResponseType.METHOD_NOT_ALLOWED);
             socketService.writeResponse(resp.getResponse("<h1>Метод не поддерживается!</h1>"));
             return;
         }

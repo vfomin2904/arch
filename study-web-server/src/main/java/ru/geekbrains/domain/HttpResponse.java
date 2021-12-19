@@ -3,26 +3,38 @@ package ru.geekbrains.domain;
 public class HttpResponse {
 
     private ResponseType type;
-    private StringBuilder response;
+    private StringBuilder response = new StringBuilder();
 
-    public HttpResponse(ResponseType type) {
-        this.type = type;
-        this.response = new StringBuilder();
+    private HttpResponse () {
     }
 
-    private void getResponseHeader() {
-        response.append("HTTP/1.1 ");
-        response.append(type.getCode()+" ");
-        response.append(type.getDescription());
-        response.append("\n");
-        response.append("Content-Type: text/html; charset=utf-8\n");
-        response.append("\n");
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public String getResponse(String body) {
-        getResponseHeader();
-        response.append(body);
-        return response.toString();
+    public static class Builder {
+
+        private final HttpResponse httpResponse;
+
+        private Builder() {
+            httpResponse = new HttpResponse();
+        }
+
+        public Builder withResponseType(ResponseType type) {
+            this.httpResponse.type = type;
+            return this;
+        }
+
+        public HttpResponse build(){
+            return this.httpResponse;
+        }
     }
 
+    public ResponseType getType() {
+        return type;
+    }
+
+    public StringBuilder getResponse() {
+        return response;
+    }
 }

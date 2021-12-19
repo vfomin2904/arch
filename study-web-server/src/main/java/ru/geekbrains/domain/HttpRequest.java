@@ -4,20 +4,54 @@ import java.util.Map;
 
 public class HttpRequest {
 
-    private final String method;
+    private String method;
 
-    private final String url;
+    private String url;
 
-    private final Map<String, String> headers;
+    private Map<String, String> headers;
 
-    private final String body;
+    private String body;
 
-    public HttpRequest(String method, String url, Map<String, String> headers, String body) {
-        this.method = method;
-        this.url = url;
-        this.headers = headers;
-        this.body = body;
+    private HttpRequest(){
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private final HttpRequest httpRequest;
+
+        private Builder(){
+            httpRequest = new HttpRequest();
+        }
+
+        public Builder withUrl(String url) {
+            this.httpRequest.url = url;
+            return this;
+        }
+
+        public Builder withMethod(String method) {
+            this.httpRequest.method = method;
+            return this;
+        }
+
+        public Builder withHeaders(Map<String, String> headers) {
+            this.httpRequest.headers = headers;
+            return this;
+        }
+
+        public Builder withBody(String body) {
+            this.httpRequest.body = body;
+            return this;
+        }
+
+        public HttpRequest build() {
+            return this.httpRequest;
+        }
+    }
+
 
     public String getMethod() {
         return method;
