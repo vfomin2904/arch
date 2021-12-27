@@ -1,40 +1,69 @@
 package ru.geekbrains.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HttpResponse {
 
-    private ResponseType type;
-    private StringBuilder response = new StringBuilder();
+    private final ResponseCode status;
 
-    private HttpResponse () {
+    private final Map<String, String> headers;
+
+    private final String body;
+
+    private HttpResponse(ResponseCode status, Map<String, String> headers, String body) {
+        this.status = status;
+        this.headers = headers;
+        this.body = body;
     }
 
-    public static Builder builder() {
+    public ResponseCode getStatus() {
+        return status;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public static Builder createBuilder() {
         return new Builder();
     }
 
     public static class Builder {
 
-        private final HttpResponse httpResponse;
+        private ResponseCode status;
+
+        private final Map<String, String> headers = new HashMap<>();
+
+        private String body;
 
         private Builder() {
-            httpResponse = new HttpResponse();
         }
 
-        public Builder withResponseType(ResponseType type) {
-            this.httpResponse.type = type;
+        public Builder withStatus(ResponseCode status) {
+            this.status = status;
             return this;
         }
 
-        public HttpResponse build(){
-            return this.httpResponse;
+        public Builder withHeader(String header, String value) {
+            this.headers.put(header, value);
+            return this;
         }
-    }
 
-    public ResponseType getType() {
-        return type;
-    }
+        public Builder withBody(String body) {
+            this.body = body;
+            return this;
+        }
 
-    public StringBuilder getResponse() {
-        return response;
+        public HttpResponse build() {
+            if (this.status == null) {
+                throw new IllegalArgumentException("Status is obligatory for Response");
+            }
+            return new HttpResponse(status, headers, body);
+        }
     }
 }
