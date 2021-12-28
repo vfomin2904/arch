@@ -30,7 +30,7 @@ public class WebServer {
                         MethodHandlerFactory.create(socketService, responseSerializer, config))
                 ).start();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
