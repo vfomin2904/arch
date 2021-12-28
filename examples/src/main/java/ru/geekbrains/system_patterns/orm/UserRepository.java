@@ -1,6 +1,7 @@
 package ru.geekbrains.system_patterns.orm;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class UserRepository {
@@ -11,7 +12,7 @@ public class UserRepository {
 
     private UnitOfWork unitOfWork;
 
-    public UserRepository(Connection conn) {
+    public UserRepository(Connection conn) throws SQLException {
         this.conn = conn;
         this.mapper = new UserMapper(conn);
         this.unitOfWork = new UnitOfWork(conn);
@@ -21,7 +22,7 @@ public class UserRepository {
         return mapper.findById(id);
     }
 
-    public void beginTransaction() {
+    public void beginTransaction() throws SQLException {
         this.unitOfWork = new UnitOfWork(conn);
     }
 
@@ -34,7 +35,7 @@ public class UserRepository {
     }
 
     public void delete(User user) {
-        unitOfWork.registerUpdate(user);
+        unitOfWork.registerDelete(user);
     }
 
     public void commitTransaction() {
